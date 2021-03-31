@@ -44,9 +44,7 @@ class FindGroupVoteDemandeurTransformer(BaseEstimator, TransformerMixin):
             txt = txt.strip()
             # Add missing accents
             txt = txt.replace("Les Republicains", "Les Républicains")
-            txt = txt.replace(
-                "democrate et republicaine", "démocrate et républicaine"
-            )
+            txt = txt.replace("democrate et republicaine", "démocrate et républicaine")
             txt = txt.replace("Republique", "République")
             # Remove déterminants
             txt = txt.replace(
@@ -58,9 +56,7 @@ class FindGroupVoteDemandeurTransformer(BaseEstimator, TransformerMixin):
                 "Mouvement Démocrate et apparentés",
             )
             # Add capital letter
-            txt = txt.replace(
-                "UDI Agir et indépendants", "UDI Agir et Indépendants"
-            )
+            txt = txt.replace("UDI Agir et indépendants", "UDI Agir et Indépendants")
             # Remove non relevant text
             txt = txt.replace("President(e) du groupe", "")
             txt = txt.replace("\xa0", " ")
@@ -74,9 +70,7 @@ class FindGroupVoteDemandeurTransformer(BaseEstimator, TransformerMixin):
             # NaN value for txt
             groupe = []
         groupe = [
-            clean_groupe_name(name)
-            for name in groupe
-            if clean_groupe_name(name) != ""
+            clean_groupe_name(name) for name in groupe if clean_groupe_name(name) != ""
         ]
         return groupe
 
@@ -292,15 +286,11 @@ class FindPartyActorTransformer(BaseEstimator, TransformerMixin):
         )
         # Special case with "Gouvernement", that is not in self.actors
         va_merge_4 = X_.merge(
-            pd.DataFrame(
-                {"slug": ["gouvernement"], "membre_parti": ["Gouvernement"]}
-            ),
+            pd.DataFrame({"slug": ["gouvernement"], "membre_parti": ["Gouvernement"]}),
             on="slug",
         )
         # Merge all the joins together
-        va_merge = (
-            va_merge_1.append(va_merge_2).append(va_merge_3).append(va_merge_4)
-        )
+        va_merge = va_merge_1.append(va_merge_2).append(va_merge_3).append(va_merge_4)
         va_merge.rename({"membre_parti": "auteur_parti"}, axis=1, inplace=True)
         # Reverse the explosion made over X, using a groupby.
         X_ = (
@@ -405,19 +395,17 @@ def get_estimator():
 
     def create_nn_model():
         nn = Sequential()
-        nn.add(Dense(64, activation="relu"))
+        nn.add(Dense(128, activation="relu"))
         nn.add(Dropout(0.2))
         nn.add(Dense(10, activation="sigmoid"))
         nn.compile(
-            optimizer=Adam(learning_rate=1e-3, decay=1e-2 / 500),
+            optimizer=Adam(learning_rate=2e-3, decay=1e-2 / 500),
             loss="binary_crossentropy",
             metrics=["accuracy"],
         )
         return nn
 
-    classifier = NeuralNet(
-        create_nn_model, epochs=1000, batch_size=500, verbose=0
-    )
+    classifier = NeuralNet(create_nn_model, epochs=1200, batch_size=200, verbose=0)
 
     model = Pipeline(
         [
